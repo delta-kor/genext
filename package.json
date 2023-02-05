@@ -1,0 +1,16 @@
+{
+  "name": "genext",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "author": "delta-kor <deltakbot1@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node .",
+    "dev": "tsc-watch --onSuccess \"node .\"",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.4.1"
+  }
+}
