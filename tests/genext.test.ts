@@ -1,6 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import { MonogenicTrait } from '../src';
 import Person from '../src/person/person';
+import Scenario from '../src/scenario/scenario';
 
 describe('single allele monogenic trait', () => {
   test('complete dominance (A > a)', () => {
@@ -8,9 +9,9 @@ describe('single allele monogenic trait', () => {
     expect(trait.toDominanceExpression()).toBe('A > a');
   });
 
-  test('incomplete dominance (B = b)', () => {
-    const trait = new MonogenicTrait({ sign: 'B', dominance: false });
-    expect(trait.toDominanceExpression()).toBe('B = b');
+  test('incomplete dominance (A = a)', () => {
+    const trait = new MonogenicTrait({ sign: 'A', dominance: false });
+    expect(trait.toDominanceExpression()).toBe('A = a');
   });
 });
 
@@ -46,7 +47,7 @@ describe('multiple allele monogenic trait', () => {
 });
 
 describe('person', () => {
-  test('1 monogenic trait', () => {
+  test('1 monogenic trait (male)', () => {
     const trait = new MonogenicTrait({ sign: 'A' });
     const person = new Person({
       traits: [trait],
@@ -54,6 +55,16 @@ describe('person', () => {
       genotype: ['A', 'a'],
     });
     expect(person.toGenotypeExpression()).toBe('A/a X/Y');
+  });
+
+  test('1 monogenic trait (female)', () => {
+    const trait = new MonogenicTrait({ sign: 'A' });
+    const person = new Person({
+      traits: [trait],
+      sex: 'female',
+      genotype: ['A', 'a'],
+    });
+    expect(person.toGenotypeExpression()).toBe('A/a X/X');
   });
 
   test('1 monogenic X chromosome linked trait', () => {
@@ -113,4 +124,15 @@ describe('person', () => {
   });
 });
 
-describe('scenario', () => {});
+describe('scenario', () => {
+  test('1 monogenic trait', () => {
+    const scenario = new Scenario([new MonogenicTrait({ sign: 'A' })]);
+
+    const mother = scenario.createPerson(['A', 'a'], 'female');
+    const father = scenario.createPerson(['A', 'a'], 'male');
+
+    for (let i = 0; i < 10; i++) {
+      console.log(scenario.cross(mother, father).toGenotypeExpression());
+    }
+  });
+});
