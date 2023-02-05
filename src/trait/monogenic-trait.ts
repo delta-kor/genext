@@ -1,13 +1,15 @@
+import { isLowerCase, isUpperCase } from '../util/utils';
+
 export type MonogenicTraitConfig =
   | SingleAlleleMonogenicTraitConfig
-  | MultiAlleleMonogenicTraitConfig;
+  | MultipleAlleleMonogenicTraitConfig;
 
 interface SingleAlleleMonogenicTraitConfig {
   sign: string;
   dominance?: boolean;
 }
 
-interface MultiAlleleMonogenicTraitConfig {
+interface MultipleAlleleMonogenicTraitConfig {
   sign: string[];
   dominance?: number[];
 }
@@ -21,22 +23,37 @@ export class MonogenicTrait {
   private readonly genes: Gene[];
 
   constructor(config: MonogenicTraitConfig) {
-    const sign = config.sign;
+    if (typeof config.sign === 'string') {
+      const sign = config.sign as string;
+      const dominance = config.dominance as boolean | undefined;
 
-    if (typeof sign === 'string') {
       if (sign.length !== 1) throw new Error('Sign must be a single character');
+
       this.genes = [
         { sign: sign.toLowerCase(), dominance: 0 },
         {
           sign: sign.toUpperCase(),
-          dominance: config.dominance === false ? 0 : 1,
+          dominance: dominance === false ? 0 : 1,
         },
       ];
     } else {
-      this.genes = sign.reverse().map((item, index) => {
+      const sign = config.sign as string[];
+      const dominance = config.dominance as number[] | undefined;
+
+      const reversed = sign.reverse();
+      if (dominance && dominance.length !== reversed.length)
+        throw new Error(
+          'Dominance array must have the same length as sign array'
+        );
+
+      this.genes = reversed.map((item, index) => {
         if (item.length !== 1)
           throw new Error('Sign must be a single character');
-        return { sign: item, dominance: index };
+
+        return {
+          sign: item,
+          dominance: (dominance && dominance.reverse()[index]) ?? index,
+        };
       });
     }
   }
@@ -46,7 +63,8 @@ export class MonogenicTrait {
 
     const sortedGenes = this.genes.sort((a, b) => {
       if (a.dominance === b.dominance) {
-        return b.sign.localeCompare(a.sign);
+        if (isUpperCase(a.sign) && isLowerCase(b.sign)) return -1;
+        return a.sign.localeCompare(b.sign);
       }
       return b.dominance - a.dominance;
     });
