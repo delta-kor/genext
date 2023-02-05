@@ -1,3 +1,4 @@
+import { ChromosomeType } from '../chromosome/chromosome';
 import { isLowerCase, isUpperCase } from '../util/utils';
 
 export type MonogenicTraitConfig =
@@ -7,11 +8,13 @@ export type MonogenicTraitConfig =
 interface SingleAlleleMonogenicTraitConfig {
   sign: string;
   dominance?: boolean;
+  chromosome?: number | 'X' | 'Y';
 }
 
 interface MultipleAlleleMonogenicTraitConfig {
   sign: string[];
   dominance?: number[];
+  chromosome?: number | 'X' | 'Y';
 }
 
 export interface Gene {
@@ -21,13 +24,18 @@ export interface Gene {
 
 export class MonogenicTrait {
   private readonly genes: Gene[];
+  private readonly chromosome: ChromosomeType;
 
   constructor(config: MonogenicTraitConfig) {
+    this.chromosome = config.chromosome || Symbol();
+
     if (typeof config.sign === 'string') {
       const sign = config.sign as string;
       const dominance = config.dominance as boolean | undefined;
 
       if (sign.length !== 1) throw new Error('Sign must be a single character');
+      if (sign === 'X' || sign === 'Y')
+        throw new Error('Sign cannot be X or Y');
 
       this.genes = [
         { sign: sign.toLowerCase(), dominance: 0 },
@@ -49,6 +57,8 @@ export class MonogenicTrait {
       this.genes = reversed.map((item, index) => {
         if (item.length !== 1)
           throw new Error('Sign must be a single character');
+        if (item === 'X' || item === 'Y')
+          throw new Error('Sign cannot be X or Y');
 
         return {
           sign: item,
@@ -56,6 +66,18 @@ export class MonogenicTrait {
         };
       });
     }
+  }
+
+  public getGeneSigns(): string[] {
+    return this.genes.map(gene => gene.sign);
+  }
+
+  public getChromosome(): ChromosomeType {
+    return this.chromosome;
+  }
+
+  public isAllosome(): boolean {
+    return this.chromosome === 'X' || this.chromosome === 'Y';
   }
 
   public toDominanceExpression(): string {

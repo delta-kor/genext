@@ -1,47 +1,116 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, test } from '@jest/globals';
 import { MonogenicTrait } from '../src';
+import Person from '../src/person/person';
 
 describe('single allele monogenic trait', () => {
-  const traitA = new MonogenicTrait({ sign: 'A' });
-  const traitB = new MonogenicTrait({ sign: 'B', dominance: false });
-
-  it('should be initialized', () => {
-    expect(traitA).toBeDefined();
-    expect(traitB).toBeDefined();
+  test('complete dominance (A > a)', () => {
+    const trait = new MonogenicTrait({ sign: 'A' });
+    expect(trait.toDominanceExpression()).toBe('A > a');
   });
 
-  it('should have correct dominance expression', () => {
-    expect(traitA.toDominanceExpression()).toBe('A > a');
-    expect(traitB.toDominanceExpression()).toBe('B = b');
+  test('incomplete dominance (B = b)', () => {
+    const trait = new MonogenicTrait({ sign: 'B', dominance: false });
+    expect(trait.toDominanceExpression()).toBe('B = b');
   });
 });
 
-describe('multi allele monogenic trait', () => {
-  const traitA = new MonogenicTrait({ sign: ['A', 'B', 'C'] });
-  const traitB = new MonogenicTrait({
-    sign: ['D', 'E', 'F'],
-    dominance: [1, 1, 0],
-  });
-  const traitC = new MonogenicTrait({
-    sign: ['G', 'H', 'I'],
-    dominance: [1, 0, 0],
-  });
-  const traitD = new MonogenicTrait({
-    sign: ['J', 'K', 'L'],
-    dominance: [0, 0, 0],
+describe('multiple allele monogenic trait', () => {
+  test('complete dominance (A > B > C)', () => {
+    const trait = new MonogenicTrait({ sign: ['A', 'B', 'C'] });
+    expect(trait.toDominanceExpression()).toBe('A > B > C');
   });
 
-  it('should be initialized', () => {
-    expect(traitA).toBeDefined();
-    expect(traitB).toBeDefined();
-    expect(traitC).toBeDefined();
-    expect(traitD).toBeDefined();
+  test('incomplete dominance (A > B = C)', () => {
+    const trait = new MonogenicTrait({
+      sign: ['A', 'B', 'C'],
+      dominance: [1, 1, 0],
+    });
+    expect(trait.toDominanceExpression()).toBe('A = B > C');
   });
 
-  it('should have correct dominance expression', () => {
-    expect(traitA.toDominanceExpression()).toBe('A > B > C');
-    expect(traitB.toDominanceExpression()).toBe('D = E > F');
-    expect(traitC.toDominanceExpression()).toBe('G > H = I');
-    expect(traitD.toDominanceExpression()).toBe('J = K = L');
+  test('incomplete dominance (A = B > C)', () => {
+    const trait = new MonogenicTrait({
+      sign: ['A', 'B', 'C'],
+      dominance: [1, 1, 0],
+    });
+    expect(trait.toDominanceExpression()).toBe('A = B > C');
+  });
+
+  test('incomplete dominance (A = B = C)', () => {
+    const trait = new MonogenicTrait({
+      sign: ['A', 'B', 'C'],
+      dominance: [0, 0, 0],
+    });
+    expect(trait.toDominanceExpression()).toBe('A = B = C');
   });
 });
+
+describe('person', () => {
+  test('1 monogenic trait', () => {
+    const trait = new MonogenicTrait({ sign: 'A' });
+    const person = new Person({
+      traits: [trait],
+      sex: 'male',
+      genotype: ['A', 'a'],
+    });
+    expect(person.toGenotypeExpression()).toBe('A/a X/Y');
+  });
+
+  test('1 monogenic X chromosome linked trait', () => {
+    const trait = new MonogenicTrait({ sign: 'A', chromosome: 'X' });
+    const person = new Person({
+      traits: [trait],
+      sex: 'male',
+      genotype: ['A', 'a'],
+    });
+    expect(person.toGenotypeExpression()).toBe('A/a');
+  });
+
+  test('1 monogenic Y chromosome linked trait', () => {
+    const trait = new MonogenicTrait({ sign: 'A', chromosome: 'Y' });
+    const person = new Person({
+      traits: [trait],
+      sex: 'male',
+      genotype: ['_', 'a'],
+    });
+    expect(person.toGenotypeExpression()).toBe('X/a');
+  });
+
+  test('2 monogenic trait', () => {
+    const traitA = new MonogenicTrait({ sign: 'A' });
+    const traitB = new MonogenicTrait({ sign: 'B' });
+
+    const person = new Person({
+      traits: [traitA, traitB],
+      sex: 'male',
+      genotype: ['AB', 'ab'],
+    });
+    expect(person.toGenotypeExpression()).toBe('A/a B/b X/Y');
+  });
+
+  test('2 monogenic linked trait', () => {
+    const traitA = new MonogenicTrait({ sign: 'A', chromosome: 1 });
+    const traitB = new MonogenicTrait({ sign: 'B', chromosome: 1 });
+
+    const person = new Person({
+      traits: [traitA, traitB],
+      sex: 'male',
+      genotype: ['AB', 'ab'],
+    });
+    expect(person.toGenotypeExpression()).toBe('AB/ab X/Y');
+  });
+
+  test('2 monogenic multiple allele dominance trait', () => {
+    const traitA = new MonogenicTrait({ sign: ['A', 'B', 'C'] });
+    const traitB = new MonogenicTrait({ sign: 'D' });
+
+    const person = new Person({
+      traits: [traitA, traitB],
+      sex: 'male',
+      genotype: ['Ad', 'CD'],
+    });
+    expect(person.toGenotypeExpression()).toBe('A/C d/D X/Y');
+  });
+});
+
+describe('scenario', () => {});
