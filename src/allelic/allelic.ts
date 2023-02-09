@@ -3,6 +3,7 @@ import { Trait } from '../trait/trait';
 export interface Gene {
   sign: string;
   dominance: number;
+  allelic: Allelic;
 }
 
 export default class Allelic {
@@ -10,7 +11,8 @@ export default class Allelic {
 
   constructor(private readonly trait: Trait) {}
 
-  public addGene(gene: Gene): void {
+  public addGene(geneBase: Omit<Gene, 'allelic'>): void {
+    const gene: Gene = { ...geneBase, allelic: this };
     this.genes.push(gene);
   }
 

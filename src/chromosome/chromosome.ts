@@ -1,4 +1,5 @@
 import Allelic from '../allelic/allelic';
+import Chromatid from '../chromatid/chromatid';
 import { Trait } from '../trait/trait';
 
 export type ChromosomeType = 'allosome' | 'autosome';
@@ -15,6 +16,10 @@ export default class Chromosome {
   constructor(config: ChromosomeConfig) {
     this.type = config.type;
     this.alleles = config.alleles;
+  }
+
+  public create(...genes: string[]): Chromatid {
+    return new Chromatid({ chromosome: this });
   }
 
   public getTraits(): Trait[] {

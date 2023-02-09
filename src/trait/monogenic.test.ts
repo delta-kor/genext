@@ -7,6 +7,8 @@ import MonogenicTrait, {
 describe('monogenic trait', () => {
   test('should be a function', () => {
     expect(MonogenicTrait).toBeInstanceOf(Function);
+    expect(XLinkedMonogenicTrait).toBeInstanceOf(Function);
+    expect(YLinkedMonogenicTrait).toBeInstanceOf(Function);
   });
 });
 

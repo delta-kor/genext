@@ -9,13 +9,13 @@ describe('chromosome', () => {
 });
 
 describe('autosome trait', () => {
-  test('monogenic', () => {
-    const trait = new MonogenicTrait('A', 'a');
-    const chromosome = new Chromosome({
-      type: 'autosome',
-      alleles: [trait.getAllelic()],
-    });
+  const trait = new MonogenicTrait('A', 'a');
+  const chromosome = new Chromosome({
+    type: 'autosome',
+    alleles: [trait.getAllelic()],
+  });
 
+  test('should return traits', () => {
     expect(chromosome.getTraits()).toEqual([trait]);
   });
 });
