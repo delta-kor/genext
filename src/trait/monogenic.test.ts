@@ -1,5 +1,14 @@
 import { describe, expect, test } from '@jest/globals';
-import MonogenicTrait from './monogenic';
+import MonogenicTrait, {
+  XLinkedMonogenicTrait,
+  YLinkedMonogenicTrait,
+} from './monogenic';
+
+describe('monogenic trait', () => {
+  test('should be a function', () => {
+    expect(MonogenicTrait).toBeInstanceOf(Function);
+  });
+});
 
 describe('dominance expression', () => {
   test('single allele complete dominance (A > a)', () => {
@@ -12,23 +21,40 @@ describe('dominance expression', () => {
     expect(trait.toDominanceExpression()).toBe('A = a');
   });
 
-  test('multiple alleles complete dominance (A > B > C)', () => {
+  test('multiple allelic complete dominance (A > B > C)', () => {
     const trait = new MonogenicTrait('A', 'B', 'C');
     expect(trait.toDominanceExpression()).toBe('A > B > C');
   });
 
-  test('multiple alleles incomplete dominance (A = B > C)', () => {
+  test('multiple allelic incomplete dominance (A = B > C)', () => {
     const trait = new MonogenicTrait(['A', 'B'], 'C');
     expect(trait.toDominanceExpression()).toBe('A = B > C');
   });
 
-  test('multiple alleles incomplete dominance (A > B = C)', () => {
+  test('multiple allelic incomplete dominance (A > B = C)', () => {
     const trait = new MonogenicTrait('A', ['B', 'C']);
     expect(trait.toDominanceExpression()).toBe('A > B = C');
   });
 
-  test('multiple alleles incomplete dominance (A = B = C)', () => {
+  test('multiple allelic incomplete dominance (A = B = C)', () => {
     const trait = new MonogenicTrait(['A', 'B', 'C']);
     expect(trait.toDominanceExpression()).toBe('A = B = C');
+  });
+});
+
+describe('linked monogenic trait', () => {
+  test('independent trait', () => {
+    const trait = new MonogenicTrait('A', 'a');
+    expect(trait).toBeInstanceOf(MonogenicTrait);
+  });
+
+  test('X chromosome linked trait', () => {
+    const trait = new XLinkedMonogenicTrait('A', 'a');
+    expect(trait).toBeInstanceOf(MonogenicTrait);
+  });
+
+  test('Y chromosome linked trait', () => {
+    const trait = new YLinkedMonogenicTrait('A', 'a');
+    expect(trait).toBeInstanceOf(MonogenicTrait);
   });
 });
