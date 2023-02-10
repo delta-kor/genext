@@ -43,7 +43,7 @@ describe('monogenic trait allosome chromatid', () => {
   });
   const chromatid = new Chromatid({
     chromosome,
-    genes: ['A', 'x'],
+    genes: ['A', 'X'],
     chromatidType: 'x',
   });
 
@@ -53,6 +53,6 @@ describe('monogenic trait allosome chromatid', () => {
     expect(genes).toBeInstanceOf(Array);
     expect(genes).toHaveLength(2);
     expect(genes[0].sign).toBe('A');
-    expect(genes[1].sign).toBe('x');
+    expect(genes[1].sign).toBe('X');
   });
 });

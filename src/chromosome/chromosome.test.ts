@@ -1,6 +1,9 @@
 import { describe, expect, test } from '@jest/globals';
 import Chromatid from '../chromatid/chromatid';
-import MonogenicTrait, { XLinkedMonogenicTrait } from '../trait/monogenic';
+import MonogenicTrait, {
+  XLinkedMonogenicTrait,
+  YLinkedMonogenicTrait,
+} from '../trait/monogenic';
 import Chromosome from './chromosome';
 
 describe('chromosome', () => {
@@ -33,10 +36,13 @@ describe('autosome trait chromosome', () => {
 
 // 성염색체 형질 염색체
 describe('allosome trait chromosome', () => {
-  const trait = new XLinkedMonogenicTrait('A', 'a');
+  const traitA = new MonogenicTrait('A', 'a');
+  const traitX = new XLinkedMonogenicTrait('X', 'x');
+  const traitY = new YLinkedMonogenicTrait('Y', 'y');
+
   const chromosome = new Chromosome({
     type: 'allosome',
-    alleles: [trait.getAllele()],
+    alleles: [traitA.getAllele(), traitX.getAllele(), traitY.getAllele()],
   });
 
   test('should return type', () => {
@@ -44,11 +50,16 @@ describe('allosome trait chromosome', () => {
   });
 
   test('should return traits', () => {
-    expect(chromosome.getTraits()).toEqual([trait]);
+    expect(chromosome.getTraits()).toEqual([traitA, traitX, traitY]);
   });
 
-  test('should create chromatid', () => {
-    const chromatid = chromosome.createX('A');
+  test('should create x chromatid', () => {
+    const chromatid = chromosome.createX('A', 'X');
+    expect(chromatid).toBeInstanceOf(Chromatid);
+  });
+
+  test('should create y chromatid', () => {
+    const chromatid = chromosome.createY('A', 'Y');
     expect(chromatid).toBeInstanceOf(Chromatid);
   });
 });

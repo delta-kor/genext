@@ -48,6 +48,12 @@ export default class Chromosome {
     return new Chromatid({ chromosome: this, genes, chromatidType: 'x' });
   }
 
+  public createY(...genes: string[]): Chromatid {
+    if (this.type === 'autosome')
+      throw new Error('Autosome chromosome cannot create allosome chromatid.');
+    return new Chromatid({ chromosome: this, genes, chromatidType: 'y' });
+  }
+
   public getType(): ChromosomeType {
     return this.type;
   }
