@@ -1,7 +1,7 @@
-import Allelic from '../allelic/allelic';
+import Allele from '../allelic/allele';
 
 export default class MonogenicTrait {
-  private readonly allelic: Allelic = new Allelic(this);
+  private readonly allelic: Allele = new Allele(this);
 
   constructor(...signs: (string | string[])[]) {
     if (signs.flat(1).length < 2)
@@ -16,6 +16,10 @@ export default class MonogenicTrait {
 
       dominance--;
     }
+  }
+
+  public getAllele(): Allele {
+    return this.allelic;
   }
 
   public toDominanceExpression(): string {
@@ -35,10 +39,6 @@ export default class MonogenicTrait {
     }
 
     return result;
-  }
-
-  public getAllelic(): Allelic {
-    return this.allelic;
   }
 }
 
